@@ -565,7 +565,6 @@ dvdnav_status_t dvdnav_get_position(dvdnav_t *this, uint32_t *pos,
 
 // ShaunS - Hack to get copy protected DVDs playing with VLC.
 // assert((signed)*pos != -1);
-//  if ((signed)*pos == -1) return DVDNAV_STATUS_ERR;
 
   pthread_mutex_unlock(&this->vm_lock);
 

@@ -565,6 +565,7 @@ dvdnav_status_t dvdnav_get_position(dvdnav_t *this, uint32_t *pos,
 
 // ShaunS - Hack to get copy protected DVDs playing with VLC.
 // assert((signed)*pos != -1);
+printerr("Position out of bounds (-1).");
 
   pthread_mutex_unlock(&this->vm_lock);
 
@@ -642,6 +643,17 @@ uint32_t dvdnav_describe_title_chapters(dvdnav_t *this, int32_t title, uint64_t 
   length = 0;
   for(i=0; i<parts; i++) {
     uint32_t cellnr, endcellnr;
+    
+    /* Fixes a crash in dvdnav_describe_title_chapters() with vlc, lsdvd, and
+       other video players.  This occurs with the "Inside Man" DVD.
+       Author: Bryce Harrington <bryce@ubuntu.com> */
+    
+    /* This mimics pgcn checks in ifoRead_VTS_PTT_SRPT() */
+    if (ptt[i].pgcn > 1000 || ptt[i].pgcn < 0) {
+      printerr("PGCN out of bounds.");
+      continue;
+    }    
+
     if (ifo->vts_pgcit->pgci_srp[ptt[i].pgcn-1].pgc_start_byte >= ifo->vts_pgcit->last_byte) {
       printerr("PGC start out of bounds");
       continue;
